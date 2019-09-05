@@ -5,16 +5,17 @@ class IsOwner(BasePermission):
     message = "You must be the owner of this booking."
 
     def has_object_permission(self, request, view, obj):
-        if obj.user == request.user:
+        if obj.user == request.user or request.user.is_staff:
             return True
         else:
             return False
 
 class IsFuture(BasePermission):
-    message = "Booking is in the past."
+    message = "Booking can't be updated unless it was 3 days away"
 
     def has_object_permission(self, request, view, obj):
-        if obj.date >= datetime.date.today():
+        days_left = (obj.date - datetime.date.today()).days
+        if days_left > 3:
             return True
         else:
             return False            
